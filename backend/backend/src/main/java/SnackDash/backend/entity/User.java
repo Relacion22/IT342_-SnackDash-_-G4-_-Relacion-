@@ -29,11 +29,15 @@ public class User {
     @Column(name = "wallet_balance", precision = 10, scale = 2)
     private BigDecimal walletBalance = BigDecimal.ZERO; // Default balance
 
+    // NEW: Tracks if the user registered normally or via Google
+    @Column(name = "auth_provider", nullable = false)
+    private String authProvider = "LOCAL";
+
     @CreationTimestamp
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
 
-    // Getters and Setters (Generate these or use Lombok @Data)
+    // --- Getters and Setters ---
 
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
@@ -52,6 +56,10 @@ public class User {
 
     public BigDecimal getWalletBalance() { return walletBalance; }
     public void setWalletBalance(BigDecimal walletBalance) { this.walletBalance = walletBalance; }
+
+    // NEW Getter and Setter
+    public String getAuthProvider() { return authProvider; }
+    public void setAuthProvider(String authProvider) { this.authProvider = authProvider; }
 
     public LocalDateTime getCreatedAt() { return createdAt; }
     public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }

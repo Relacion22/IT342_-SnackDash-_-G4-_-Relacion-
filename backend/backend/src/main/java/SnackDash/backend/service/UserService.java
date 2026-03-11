@@ -38,6 +38,9 @@ public class UserService {
         newUser.setPassword(passwordEncoder.encode(rawPassword));
         newUser.setRole(role);
 
+        // Explicitly set as LOCAL for standard email/password registrations
+        newUser.setAuthProvider("LOCAL");
+
         return userRepository.save(newUser);
     }
 
@@ -79,6 +82,9 @@ public class UserService {
                 newUser.setName(name);
                 // Assign the role they selected on the frontend
                 newUser.setRole(selectedRole != null ? selectedRole : Role.STUDENT);
+
+                // NEW: Tell the database this is a Google account
+                newUser.setAuthProvider("GOOGLE");
 
                 // Give them a random UUID password since they use Google to log in
                 newUser.setPassword(passwordEncoder.encode(java.util.UUID.randomUUID().toString()));
