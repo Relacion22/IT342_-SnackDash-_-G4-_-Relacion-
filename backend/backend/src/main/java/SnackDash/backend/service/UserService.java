@@ -1,12 +1,11 @@
 package SnackDash.backend.service;
 
+import SnackDash.backend.entity.Enums.Role;
 import SnackDash.backend.entity.User;
-import SnackDash.backend.entity.Role;
 import SnackDash.backend.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
-
 import java.util.Optional;
 
 @Service

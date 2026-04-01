@@ -1,6 +1,6 @@
 package SnackDash.backend.dto;
 
-import SnackDash.backend.entity.Role;
+import SnackDash.backend.entity.Enums.Role;
 
 public class RegisterRequest {
     private String name;
