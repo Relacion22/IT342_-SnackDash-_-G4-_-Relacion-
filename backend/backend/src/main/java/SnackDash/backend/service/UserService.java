@@ -2,6 +2,7 @@ package SnackDash.backend.service;
 
 import SnackDash.backend.entity.Enums.Role;
 import SnackDash.backend.entity.User;
+import SnackDash.backend.factory.UserFactory;
 import SnackDash.backend.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -14,6 +15,9 @@ public class UserService {
     @Autowired
     private UserRepository userRepository;
 
+    @Autowired
+    private UserFactory userFactory; // 1. Inject the new Factory
+
     private BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
     // 1. User Registration Logic
@@ -23,22 +27,17 @@ public class UserService {
             throw new Exception("Email is already registered!");
         }
 
-        // Create new user
-        User newUser = new User();
-        newUser.setName(name);
-        newUser.setEmail(email);
-
         // Hash the password using BCrypt
         String hashedPassword = passwordEncoder.encode(rawPassword);
-        newUser.setPassword(hashedPassword);
 
-        newUser.setRole(role);
+        // 2. REFACTORED: Use the factory to create the user object
+        User newUser = userFactory.createUser(name, email, hashedPassword, role);
 
         // Save to database
         return userRepository.save(newUser);
     }
 
-    // 2. User Login Logic (We'll use this later in the controller)
+    // 2. User Login Logic
     public Optional<User> authenticateUser(String email, String rawPassword) {
         Optional<User> userOpt = userRepository.findByEmail(email);
 
