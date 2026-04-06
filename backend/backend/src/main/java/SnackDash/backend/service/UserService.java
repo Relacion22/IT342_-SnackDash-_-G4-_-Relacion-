@@ -1,18 +1,12 @@
 package SnackDash.backend.service;
 
+import SnackDash.backend.entity.Enums.Role;
 import SnackDash.backend.entity.User;
-import SnackDash.backend.entity.Role;
 import SnackDash.backend.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
-import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
-import com.google.api.client.http.javanet.NetHttpTransport;
-import com.google.api.client.json.gson.GsonFactory;
-
-import java.util.Collections;
 import java.util.Optional;
 
 @Service
@@ -23,76 +17,39 @@ public class UserService {
 
     private BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
-    // Replace this with your actual Google Client ID from Google Cloud Console
-    private static final String CLIENT_ID = "569783179376-ctp1kqkeasiasm4pu42lkcmjojn4e6tb.apps.googleusercontent.com";
-
-    // 1. User Registration Logic (Standard)
+    // 1. User Registration Logic
     public User registerUser(String name, String email, String rawPassword, Role role) throws Exception {
+        // Check if email already exists
         if (userRepository.existsByEmail(email)) {
             throw new Exception("Email is already registered!");
         }
 
+        // Create new user
         User newUser = new User();
         newUser.setName(name);
         newUser.setEmail(email);
-        newUser.setPassword(passwordEncoder.encode(rawPassword));
+
+        // Hash the password using BCrypt
+        String hashedPassword = passwordEncoder.encode(rawPassword);
+        newUser.setPassword(hashedPassword);
+
         newUser.setRole(role);
 
-        // Explicitly set as LOCAL for standard email/password registrations
-        newUser.setAuthProvider("LOCAL");
-
+        // Save to database
         return userRepository.save(newUser);
     }
 
-    // 2. User Login Logic (Standard)
+    // 2. User Login Logic (We'll use this later in the controller)
     public Optional<User> authenticateUser(String email, String rawPassword) {
         Optional<User> userOpt = userRepository.findByEmail(email);
 
         if (userOpt.isPresent()) {
             User user = userOpt.get();
+            // Check if the raw password matches the hashed password in the DB
             if (passwordEncoder.matches(rawPassword, user.getPassword())) {
                 return Optional.of(user);
             }
         }
         return Optional.empty();
-    }
-
-    // 3. NEW: Google Sign-In Logic
-    public User verifyGoogleTokenAndLogin(String idTokenString, Role selectedRole) throws Exception {
-        GoogleIdTokenVerifier verifier = new GoogleIdTokenVerifier.Builder(new NetHttpTransport(), new GsonFactory())
-                .setAudience(Collections.singletonList(CLIENT_ID))
-                .build();
-
-        GoogleIdToken idToken = verifier.verify(idTokenString);
-        if (idToken != null) {
-            GoogleIdToken.Payload payload = idToken.getPayload();
-
-            String email = payload.getEmail();
-            String name = (String) payload.get("name");
-
-            Optional<User> existingUser = userRepository.findByEmail(email);
-
-            if (existingUser.isPresent()) {
-                // User exists, return the user to log them in
-                return existingUser.get();
-            } else {
-                // User doesn't exist, register them automatically
-                User newUser = new User();
-                newUser.setEmail(email);
-                newUser.setName(name);
-                // Assign the role they selected on the frontend
-                newUser.setRole(selectedRole != null ? selectedRole : Role.STUDENT);
-
-                // NEW: Tell the database this is a Google account
-                newUser.setAuthProvider("GOOGLE");
-
-                // Give them a random UUID password since they use Google to log in
-                newUser.setPassword(passwordEncoder.encode(java.util.UUID.randomUUID().toString()));
-
-                return userRepository.save(newUser);
-            }
-        } else {
-            throw new Exception("Invalid Google ID token.");
-        }
     }
 }

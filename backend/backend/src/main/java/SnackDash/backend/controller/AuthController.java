@@ -8,7 +8,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import SnackDash.backend.dto.GoogleLoginRequest;
 
 import java.util.Optional;
 
@@ -16,15 +15,6 @@ import java.util.Optional;
 @RequestMapping("/api/auth")
 @CrossOrigin(origins = {"http://localhost:5173", "http://localhost:5174"})
 public class AuthController {
-    @PostMapping("/google")
-    public ResponseEntity<?> googleLogin(@RequestBody GoogleLoginRequest request) {
-        try {
-            User user = userService.verifyGoogleTokenAndLogin(request.getToken(), request.getRole());
-            return ResponseEntity.ok("Google login successful for: " + user.getEmail());
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Google authentication failed: " + e.getMessage());
-        }
-    }
 
     @Autowired
     private UserService userService;
