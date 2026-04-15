@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Search, Home, ShoppingBag, User, Wallet, Star, LogOut, LayoutDashboard, MapPin } from "lucide-react";
 
@@ -63,6 +63,15 @@ export default function StudentDashboard() {
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState("");
   const [activeTab, setActiveTab] = useState("home");
+  const [studentName, setStudentName] = useState("Student");
+
+  // Retrieve student name from localStorage on component mount
+  useEffect(() => {
+    const savedName = localStorage.getItem('userName');
+    if (savedName) {
+      setStudentName(savedName);
+    }
+  }, []);
 
   const filteredStalls = mockStalls.filter((stall) =>
     stall.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
@@ -126,7 +135,7 @@ export default function StudentDashboard() {
         {/* Top Header (Greeting + Search) */}
         <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '3rem', flexWrap: 'wrap', gap: '2rem' }}>
           <div>
-            <h2 style={{ fontSize: '2.25rem', fontWeight: '800', color: '#0f172a', margin: '0 0 0.5rem 0', letterSpacing: '-0.025em' }}>Welcome back, Student! 👋</h2>
+            <h2 style={{ fontSize: '2.25rem', fontWeight: '800', color: '#0f172a', margin: '0 0 0.5rem 0', letterSpacing: '-0.025em' }}>Welcome back, {studentName}! 👋</h2>
             <p style={{ color: '#64748b', fontSize: '1.05rem', margin: 0 }}>What are you craving today?</p>
           </div>
 

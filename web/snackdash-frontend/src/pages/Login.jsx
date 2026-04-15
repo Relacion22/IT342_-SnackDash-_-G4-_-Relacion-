@@ -20,6 +20,10 @@ export default function Login() {
         email,
         password
       });
+      // Store user info in localStorage
+      localStorage.setItem('userEmail', email);
+      const nameFromEmail = email.split('@')[0]; // Extract name from email
+      localStorage.setItem('userName', nameFromEmail);
       setMessage("✅ " + response.data);
       setTimeout(() => navigate("/dashboard"), 1500);
     } catch (error) {
@@ -40,6 +44,11 @@ export default function Login() {
         role: role // Backend assigns this role if it's a new user
       });
 
+      // Store user info in localStorage from Google response
+      const credentialResponseDecoded = JSON.parse(atob(credentialResponse.credential.split('.')[1]));
+      const userName = credentialResponseDecoded.name || credentialResponseDecoded.email?.split('@')[0] || 'Student';
+      localStorage.setItem('userName', userName);
+      localStorage.setItem('userEmail', credentialResponseDecoded.email);
       setMessage("✅ Google Login successful!");
       setTimeout(() => {
         navigate("/dashboard"); // Redirect to dashboard
