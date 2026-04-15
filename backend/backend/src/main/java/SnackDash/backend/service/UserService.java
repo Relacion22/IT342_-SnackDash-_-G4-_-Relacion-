@@ -50,4 +50,22 @@ public class UserService {
         }
         return Optional.empty();
     }
+
+    public User processOAuthPostLogin(String email, String name, Role role) {
+        Optional<User> existUser = userRepository.findByEmail(email); // Assuming you have this in your UserRepository
+
+        if (existUser.isPresent()) {
+            return existUser.get(); // User already exists, just return them
+        } else {
+            // New user from Google, save them to the database
+            User newUser = new User();
+            newUser.setEmail(email);
+            newUser.setName(name);
+            newUser.setRole(role);
+            // Note: For Google logins, you might leave the password null or set a random dummy password
+            // since they authenticate via Google.
+
+            return userRepository.save(newUser);
+        }
+    }
 }
