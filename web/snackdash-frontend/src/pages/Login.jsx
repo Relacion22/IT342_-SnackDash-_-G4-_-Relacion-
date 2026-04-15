@@ -15,17 +15,55 @@ export default function Login() {
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
-      // Sends email and password to your Spring Boot LoginRequest DTO
+      // Sends email, password, and role to your Spring Boot LoginRequest DTO
       const response = await axios.post('http://localhost:8080/api/auth/login', {
         email,
-        password
+        password,
+        role  // Include the selected role
       });
-      // Store user info in localStorage
-      localStorage.setItem('userEmail', email);
-      const nameFromEmail = email.split('@')[0]; // Extract name from email
-      localStorage.setItem('userName', nameFromEmail);
-      setMessage("✅ " + response.data);
-      setTimeout(() => navigate("/dashboard"), 1500);
+      
+      // Extract data from response
+      const { token, email: responseEmail, name, role: responseRole } = response.data;
+      
+      // Store user info and token in localStorage
+      localStorage.setItem('token', token);
+      localStorage.setItem('userEmail', responseEmail);
+      localStorage.setItem('userName', name);
+      localStorage.setItem('userRole', responseRole);
+      
+      setMessage("✅ " + response.data.message);
+      
+      // Redirect based on role
+      if (responseRole === "OWNER") {
+        // Check if owner has a stall
+        try {
+          const stallResponse = await axios.get('http://localhost:8080/api/stall/my-stall', {
+            headers: { Authorization: `Bearer ${token}` }
+          });
+          
+          setTimeout(() => {
+            if (stallResponse.data) {
+              // Owner has a stall, go to menu dashboard
+              localStorage.setItem('stallId', stallResponse.data.id);
+              localStorage.setItem('stallName', stallResponse.data.name);
+              navigate("/menu-dashboard");
+            } else {
+              // Owner doesn't have a stall, go to stall creation
+              navigate("/create-stall");
+            }
+          }, 1500);
+        } catch (stallError) {
+          // If there's an error fetching stall, assume they need to create one
+          setTimeout(() => {
+            navigate("/create-stall");
+          }, 1500);
+        }
+      } else {
+        // Student, go to dashboard
+        setTimeout(() => {
+          navigate("/dashboard");
+        }, 1500);
+      }
     } catch (error) {
       if (error.response) {
         setMessage("❌ " + error.response.data);
@@ -41,21 +79,57 @@ export default function Login() {
       // Send the Google token to your Spring Boot backend
       const response = await axios.post('http://localhost:8080/api/auth/google', {
         token: credentialResponse.credential,
-        role: role // Backend assigns this role if it's a new user
+        role: role // Backend validates this role matches user's account role
       });
 
-      // Store user info in localStorage from Google response
-      const credentialResponseDecoded = JSON.parse(atob(credentialResponse.credential.split('.')[1]));
-      const userName = credentialResponseDecoded.name || credentialResponseDecoded.email?.split('@')[0] || 'Student';
-      localStorage.setItem('userName', userName);
-      localStorage.setItem('userEmail', credentialResponseDecoded.email);
-      setMessage("✅ Google Login successful!");
-      setTimeout(() => {
-        navigate("/dashboard"); // Redirect to dashboard
-      }, 1500);
+      // Extract data from response
+      const { token, email: responseEmail, name, role: responseRole } = response.data;
+
+      // Store user info and token in localStorage
+      localStorage.setItem('token', token);
+      localStorage.setItem('userName', name);
+      localStorage.setItem('userEmail', responseEmail);
+      localStorage.setItem('userRole', responseRole);
+      setMessage("✅ " + response.data.message);
+      
+      // Redirect based on role
+      if (responseRole === "OWNER") {
+        // Check if owner has a stall
+        try {
+          const stallResponse = await axios.get('http://localhost:8080/api/stall/my-stall', {
+            headers: { Authorization: `Bearer ${token}` }
+          });
+          
+          setTimeout(() => {
+            if (stallResponse.data) {
+              // Owner has a stall, go to menu dashboard
+              localStorage.setItem('stallId', stallResponse.data.id);
+              localStorage.setItem('stallName', stallResponse.data.name);
+              navigate("/menu-dashboard");
+            } else {
+              // Owner doesn't have a stall, go to stall creation
+              navigate("/create-stall");
+            }
+          }, 1500);
+        } catch (stallError) {
+          // If there's an error fetching stall, assume they need to create one
+          setTimeout(() => {
+            navigate("/create-stall");
+          }, 1500);
+        }
+      } else {
+        // Student, go to dashboard
+        setTimeout(() => {
+          navigate("/dashboard");
+        }, 1500);
+      }
 
     } catch (error) {
-      setMessage("❌ Google authentication failed.");
+      if (error.response?.data) {
+        setMessage("❌ " + error.response.data);
+      } else {
+        setMessage("❌ Google authentication failed.");
+      }
     }
   };
 

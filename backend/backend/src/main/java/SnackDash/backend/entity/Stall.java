@@ -24,10 +24,14 @@ public class Stall {
     private boolean isOpen = false;
 
     // --- ADDED FIELDS BASED ON UI ---
-    @Column(name = "image_url")
+    @Column(name = "image_url", columnDefinition = "TEXT")
     private String imageUrl; // For the cover photo of the stall
 
+    @Column(columnDefinition = "TEXT")
     private String category; // e.g., "Italian", "American"
+
+    @Column(columnDefinition = "TEXT")
+    private String description;
 
     @Column(precision = 3, scale = 1)
     private BigDecimal rating = BigDecimal.ZERO; // e.g., 4.8
@@ -85,6 +89,14 @@ public class Stall {
 
     public void setCategory(String category) {
         this.category = category;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 
     public BigDecimal getRating() {
