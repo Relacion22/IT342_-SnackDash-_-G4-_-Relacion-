@@ -1,10 +1,12 @@
 package SnackDash.backend.controller;
 
 import SnackDash.backend.dto.LoginRequest;
+import SnackDash.backend.dto.LoginResponse;
 import SnackDash.backend.dto.RegisterRequest;
 import SnackDash.backend.dto.GoogleLoginRequest; // Make sure you created this DTO
 import SnackDash.backend.entity.User;
 import SnackDash.backend.service.UserService;
+import SnackDash.backend.util.JwtTokenProvider;
 
 // Google API Client Imports
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
@@ -28,6 +30,9 @@ public class AuthController {
     @Autowired
     private UserService userService;
 
+    @Autowired
+    private JwtTokenProvider jwtTokenProvider;
+
     @PostMapping("/register")
     public ResponseEntity<?> register(@RequestBody RegisterRequest request) {
         try {
@@ -48,10 +53,27 @@ public class AuthController {
         Optional<User> userOpt = userService.authenticateUser(request.getEmail(), request.getPassword());
 
         if (userOpt.isPresent()) {
-            return ResponseEntity.ok("Login successful!");
-            // Note: In Phase 2 you'll return a JWT token here!
+            User user = userOpt.get();
+            
+            // Check if the user's role matches the requested role
+            if (request.getRole() != null && !request.getRole().equals(user.getRole().toString())) {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).body("❌ Invalid role. You are a " + user.getRole() + ", not a " + request.getRole() + ".");
+            }
+            
+            // Generate JWT token
+            String token = jwtTokenProvider.generateToken(user.getEmail(), user.getRole().toString());
+            
+            // Return login response with token
+            LoginResponse response = new LoginResponse(
+                    "✅ Login successful!",
+                    token,
+                    user.getEmail(),
+                    user.getName(),
+                    user.getRole().toString()
+            );
+            return ResponseEntity.ok(response);
         } else {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid email or password");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("❌ Invalid email or password");
         }
     }
 
@@ -80,8 +102,23 @@ public class AuthController {
                 // 4. Find or create the user in your database using the service method
                 User user = userService.processOAuthPostLogin(email, name, request.getRole());
 
-                return ResponseEntity.ok("Google Login successful for " + email);
-                // Note: In Phase 2, you'll generate and return a JWT token here just like standard login!
+                // 5. Check if the user's role matches the requested role
+                if (request.getRole() != null && !request.getRole().equals(user.getRole().toString())) {
+                    return ResponseEntity.status(HttpStatus.FORBIDDEN).body("❌ Invalid role. You are a " + user.getRole() + ", not a " + request.getRole() + ".");
+                }
+
+                // 6. Generate JWT token
+                String token = jwtTokenProvider.generateToken(user.getEmail(), user.getRole().toString());
+
+                // 7. Return login response with token
+                LoginResponse response = new LoginResponse(
+                        "✅ Google Login successful!",
+                        token,
+                        user.getEmail(),
+                        user.getName(),
+                        user.getRole().toString()
+                );
+                return ResponseEntity.ok(response);
 
             } else {
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid Google token");
