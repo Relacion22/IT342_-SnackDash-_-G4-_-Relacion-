@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
-import { ArrowLeft, Clock3, ShoppingBag } from "lucide-react";
+import { ArrowLeft, Clock3, ShoppingBag, X } from "lucide-react";
 
 const API_BASE_URL = "http://localhost:8080/api";
 
@@ -12,6 +12,10 @@ export default function StallDetails() {
   const [menuItems, setMenuItems] = useState([]);
   const [message, setMessage] = useState("");
   const [orderingId, setOrderingId] = useState(null);
+  const [showOrderModal, setShowOrderModal] = useState(false);
+  const [quantity, setQuantity] = useState(1);
+  const [paymentMethod, setPaymentMethod] = useState("CASH");
+  const [selectedItemId, setSelectedItemId] = useState(null);
 
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -24,8 +28,8 @@ export default function StallDetails() {
     const loadStall = async () => {
       try {
         const [stallResponse, menuResponse] = await Promise.all([
-          axios.get(`${API_BASE_URL}/marketplace/stalls/${stallId}`, { headers: { Authorization: `Bearer ${token}` } }),
-          axios.get(`${API_BASE_URL}/marketplace/stalls/${stallId}/menu`, { headers: { Authorization: `Bearer ${token}` } }),
+          axios.get(`${API_BASE_URL}/marketplace/stalls/${stallId}`),
+          axios.get(`${API_BASE_URL}/marketplace/stalls/${stallId}/menu`),
         ]);
         setStall(stallResponse.data);
         setMenuItems(menuResponse.data);
@@ -37,16 +41,25 @@ export default function StallDetails() {
     loadStall();
   }, [navigate, stallId]);
 
-  const handleBuy = async (menuItemId) => {
+  const handleBuy = (menuItemId) => {
+    setSelectedItemId(menuItemId);
+    setQuantity(1);
+    setPaymentMethod("CASH");
+    setShowOrderModal(true);
+  };
+
+  const handleConfirmOrder = async () => {
     try {
       const token = localStorage.getItem("token");
-      setOrderingId(menuItemId);
+      setOrderingId(selectedItemId);
       await axios.post(
         `${API_BASE_URL}/orders`,
-        { menuItemId, quantity: 1, specialInstructions: "" },
+        { menuItemId: selectedItemId, quantity: parseInt(quantity), specialInstructions: `Payment: ${paymentMethod}` },
         { headers: { Authorization: `Bearer ${token}` } }
       );
-      navigate("/my-orders");
+      setShowOrderModal(false);
+      setMessage("✅ Order placed successfully!");
+      setTimeout(() => navigate("/my-orders"), 1500);
     } catch (error) {
       setMessage(typeof error.response?.data === "string" ? error.response.data : "Failed to place order.");
     } finally {
@@ -108,6 +121,131 @@ export default function StallDetails() {
           </div>
         ))}
       </div>
+
+      {/* Order Confirmation Modal */}
+      {showOrderModal && (
+        <div style={{
+          position: "fixed",
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          backgroundColor: "rgba(0, 0, 0, 0.6)",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          zIndex: 1000
+        }}>
+          <div style={{
+            backgroundColor: "white",
+            borderRadius: "12px",
+            padding: "2rem",
+            width: "90%",
+            maxWidth: "400px",
+            boxShadow: "0 20px 25px -5px rgba(0, 0, 0, 0.1)"
+          }}>
+            {/* Modal Header */}
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1.5rem" }}>
+              <h2 style={{ margin: 0, color: "#0f172a" }}>Confirm Order</h2>
+              <button
+                onClick={() => setShowOrderModal(false)}
+                style={{ background: "none", border: "none", cursor: "pointer", fontSize: "1.5rem", color: "#64748b" }}
+              >
+                <X size={24} />
+              </button>
+            </div>
+
+            {/* Quantity Section */}
+            <div style={{ marginBottom: "1.5rem" }}>
+              <label style={{ display: "block", marginBottom: "0.5rem", color: "#0f172a", fontWeight: 600 }}>
+                Quantity (1-10)
+              </label>
+              <input
+                type="number"
+                min="1"
+                max="10"
+                value={quantity}
+                onChange={(e) => setQuantity(Math.min(Math.max(e.target.value, 1), 10))}
+                style={{
+                  width: "100%",
+                  padding: "0.75rem",
+                  border: "1px solid #e2e8f0",
+                  borderRadius: "8px",
+                  fontSize: "1rem",
+                  boxSizing: "border-box"
+                }}
+              />
+            </div>
+
+            {/* Payment Method Section */}
+            <div style={{ marginBottom: "1.5rem" }}>
+              <label style={{ display: "block", marginBottom: "0.75rem", color: "#0f172a", fontWeight: 600 }}>
+                Payment Method
+              </label>
+              <div style={{ display: "flex", flexDirection: "column", gap: "0.75rem" }}>
+                <label style={{ display: "flex", alignItems: "center", cursor: "pointer" }}>
+                  <input
+                    type="radio"
+                    name="payment"
+                    value="CASH"
+                    checked={paymentMethod === "CASH"}
+                    onChange={(e) => setPaymentMethod(e.target.value)}
+                    style={{ marginRight: "0.75rem", cursor: "pointer" }}
+                  />
+                  <span style={{ color: "#334155" }}>Cash Payment</span>
+                </label>
+                <label style={{ display: "flex", alignItems: "center", cursor: "pointer" }}>
+                  <input
+                    type="radio"
+                    name="payment"
+                    value="ONLINE"
+                    checked={paymentMethod === "ONLINE"}
+                    onChange={(e) => setPaymentMethod(e.target.value)}
+                    style={{ marginRight: "0.75rem", cursor: "pointer" }}
+                  />
+                  <span style={{ color: "#334155" }}>Online Payment</span>
+                </label>
+              </div>
+            </div>
+
+            {/* Action Buttons */}
+            <div style={{ display: "flex", gap: "0.75rem" }}>
+              <button
+                onClick={() => setShowOrderModal(false)}
+                style={{
+                  flex: 1,
+                  padding: "0.75rem",
+                  border: "1px solid #e2e8f0",
+                  borderRadius: "8px",
+                  backgroundColor: "white",
+                  color: "#485563",
+                  fontWeight: 600,
+                  cursor: "pointer",
+                  fontSize: "0.95rem"
+                }}
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleConfirmOrder}
+                style={{
+                  flex: 1,
+                  padding: "0.75rem",
+                  border: "none",
+                  borderRadius: "8px",
+                  backgroundColor: "#7A0019",
+                  color: "white",
+                  fontWeight: 600,
+                  cursor: "pointer",
+                  fontSize: "0.95rem"
+                }}
+              >
+                Place Order
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
-import { Trash2, Edit2, Upload } from "lucide-react";
+import { Trash2, Edit2, Upload, Power } from "lucide-react";
 import { uploadImageToSupabase } from "../lib/storage";
 
 const API_BASE_URL = "http://localhost:8080/api";
@@ -212,6 +212,28 @@ export default function MenuDashboard() {
     }
   };
 
+  const handleToggleStallStatus = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      const newStatus = !stall.isOpen;
+      await axios.put(
+        `${API_BASE_URL}/stall/${stall.id}`,
+        { 
+          name: stall.name,
+          category: stall.category,
+          description: stall.description,
+          imageUrl: stall.imageUrl,
+          isOpen: newStatus
+        },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      setStall({ ...stall, isOpen: newStatus });
+      setMessage(`✅ Stall is now ${newStatus ? "OPEN" : "CLOSED"}`);
+    } catch (error) {
+      setMessage(typeof error.response?.data === "string" ? error.response.data : "Failed to update stall status.");
+    }
+  };
+
   const resetForm = () => {
     setName("");
     setPrice("");
@@ -231,8 +253,34 @@ export default function MenuDashboard() {
   return (
     <div style={{ padding: "2rem", fontFamily: "sans-serif", maxWidth: "1280px", margin: "0 auto", backgroundColor: "#f9fafb", minHeight: "100vh" }}>
       <header style={{ backgroundColor: "#7A0019", padding: "1.5rem", color: "white", borderRadius: "8px", marginBottom: "2rem" }}>
-        <h2 style={{ margin: 0, fontSize: "1.8rem" }}>Stall Owner Dashboard</h2>
-        <p style={{ margin: "0.5rem 0 0 0", opacity: 0.9 }}>{stall ? `Managing ${stall.name}` : "Manage menu items and incoming orders"}</p>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+          <div>
+            <h2 style={{ margin: 0, fontSize: "1.8rem" }}>Stall Owner Dashboard</h2>
+            <p style={{ margin: "0.5rem 0 0 0", opacity: 0.9 }}>{stall ? `Managing ${stall.name}` : "Manage menu items and incoming orders"}</p>
+          </div>
+          {stall && (
+            <button
+              onClick={handleToggleStallStatus}
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: "0.5rem",
+                padding: "0.75rem 1.5rem",
+                borderRadius: "8px",
+                border: "none",
+                fontWeight: "600",
+                cursor: "pointer",
+                backgroundColor: stall.isOpen ? "#10b981" : "#ef4444",
+                color: "white",
+                fontSize: "1rem",
+                transition: "all 0.3s ease"
+              }}
+            >
+              <Power size={18} />
+              {stall.isOpen ? "OPEN" : "CLOSED"}
+            </button>
+          )}
+        </div>
       </header>
 
       {message && (

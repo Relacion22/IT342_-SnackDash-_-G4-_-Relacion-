@@ -21,7 +21,7 @@ public class Stall {
     private User owner;
 
     @Column(name = "is_open", nullable = false)
-    private boolean isOpen = false;
+    private boolean isOpen = true;
 
     // --- ADDED FIELDS BASED ON UI ---
     @Column(name = "image_url", columnDefinition = "TEXT")
