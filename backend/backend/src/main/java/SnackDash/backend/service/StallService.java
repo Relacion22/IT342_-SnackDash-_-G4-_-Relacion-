@@ -81,10 +81,21 @@ public class StallService {
         }
 
         Stall stall = stallOpt.get();
-        stall.setName(request.getName());
-        stall.setCategory(request.getCategory());
-        stall.setDescription(request.getDescription());
-        stall.setImageUrl(request.getImageUrl());
+        if (request.getName() != null) {
+            stall.setName(request.getName());
+        }
+        if (request.getCategory() != null) {
+            stall.setCategory(request.getCategory());
+        }
+        if (request.getDescription() != null) {
+            stall.setDescription(request.getDescription());
+        }
+        if (request.getImageUrl() != null) {
+            stall.setImageUrl(request.getImageUrl());
+        }
+        if (request.getIsOpen() != null) {
+            stall.setOpen(request.getIsOpen());
+        }
 
         Stall updatedStall = stallRepository.save(stall);
 

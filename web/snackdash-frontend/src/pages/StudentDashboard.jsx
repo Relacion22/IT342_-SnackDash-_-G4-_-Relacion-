@@ -27,9 +27,7 @@ export default function StudentDashboard() {
 
   const fetchStalls = async (token) => {
     try {
-      const response = await axios.get(`${API_BASE_URL}/marketplace/stalls`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const response = await axios.get(`${API_BASE_URL}/marketplace/stalls`);
       setStalls(response.data);
     } catch (error) {
       setMessage("Failed to load campus stalls.");

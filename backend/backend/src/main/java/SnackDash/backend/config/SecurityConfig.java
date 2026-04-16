@@ -40,6 +40,8 @@ public class SecurityConfig {
                 // 2. Explicitly allow preflight OPTIONS requests
                 .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                 .requestMatchers("/api/auth/**").permitAll()
+                // Allow public marketplace access (no auth required)
+                .requestMatchers("/api/marketplace/**").permitAll()
                 
                 // 3. Changed from hasRole to hasAuthority
                 .requestMatchers("/api/stall/**", "/api/menu/**", "/api/orders/owner").hasAuthority("OWNER")

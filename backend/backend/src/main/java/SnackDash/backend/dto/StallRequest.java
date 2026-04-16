@@ -5,6 +5,7 @@ public class StallRequest {
     private String category;
     private String description;
     private String imageUrl;
+    private Boolean isOpen;
 
     // Constructor
     public StallRequest() {
@@ -48,5 +49,13 @@ public class StallRequest {
 
     public void setImageUrl(String imageUrl) {
         this.imageUrl = imageUrl;
+    }
+
+    public Boolean getIsOpen() {
+        return isOpen;
+    }
+
+    public void setIsOpen(Boolean isOpen) {
+        this.isOpen = isOpen;
     }
 }
