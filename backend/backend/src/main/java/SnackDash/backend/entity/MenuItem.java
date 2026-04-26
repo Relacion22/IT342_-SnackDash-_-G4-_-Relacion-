@@ -25,13 +25,17 @@ public class MenuItem {
     private boolean isAvailable = true;
 
     // --- ADDED FIELDS BASED ON UI ---
-    @Column(name = "image_url")
+    @Column(name = "image_url", columnDefinition = "TEXT")
     private String imageUrl; // Picture of the food
 
     @Column(columnDefinition = "TEXT")
     private String description; // Ingredients/Allergies
 
+    @Column(columnDefinition = "TEXT")
     private String category; // e.g., "Meals", "Drinks"
+
+    @Column(name = "cooking_time_minutes")
+    private Integer cookingTimeMinutes; // Time in minutes to prepare the item
 
     @Column(name = "is_deleted", nullable = false)
     private boolean isDeleted = false; // Soft delete to keep old receipts safe
@@ -109,5 +113,13 @@ public class MenuItem {
 
     public void setDeleted(boolean deleted) {
         isDeleted = deleted;
+    }
+
+    public Integer getCookingTimeMinutes() {
+        return cookingTimeMinutes;
+    }
+
+    public void setCookingTimeMinutes(Integer cookingTimeMinutes) {
+        this.cookingTimeMinutes = cookingTimeMinutes;
     }
 }

@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
+import api from "../lib/api";
 import { Lock } from "lucide-react";
 import { GoogleLogin } from '@react-oauth/google';
 
@@ -15,16 +15,44 @@ export default function Login() {
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
-      // Sends email and password to your Spring Boot LoginRequest DTO
-      const response = await axios.post('http://localhost:8080/api/auth/login', {
+      // Sends email, password, and role to your Spring Boot LoginRequest DTO
+      const response = await api.post('/auth/login', {
         email,
-        password
+        password,
+        role  // Include the selected role
       });
-      setMessage("✅ " + response.data);
-      setTimeout(() => navigate("/dashboard"), 1500);
+
+      // Extract data from response
+      const { token, email: responseEmail, name, role: responseRole } = response.data;
+
+      // Store user info and token in localStorage
+      localStorage.setItem('token', token);
+      localStorage.setItem('userEmail', responseEmail);
+      localStorage.setItem('userName', name);
+      localStorage.setItem('userRole', responseRole);
+
+      const successMessage = response.data?.message || "Login successful.";
+      setMessage("✅ " + successMessage);
+
+      // Redirect based on role
+      if (responseRole === "ADMIN") {
+        setTimeout(() => {
+          navigate("/admin-dashboard");
+        }, 1500);
+      } else if (responseRole === "OWNER") {
+        setTimeout(() => {
+          navigate("/menu-dashboard");
+        }, 1500);
+      } else {
+        // Student, go to dashboard
+        setTimeout(() => {
+          navigate("/dashboard");
+        }, 1500);
+      }
     } catch (error) {
-      if (error.response) {
-        setMessage("❌ " + error.response.data);
+      if (error.response?.data) {
+        const backendMessage = error.response.data?.error || error.response.data?.message || error.response.data;
+        setMessage("❌ " + backendMessage);
       } else {
         setMessage("❌ Cannot connect to server.");
       }
@@ -35,18 +63,45 @@ export default function Login() {
   const handleGoogleSuccess = async (credentialResponse) => {
     try {
       // Send the Google token to your Spring Boot backend
-      const response = await axios.post('http://localhost:8080/api/auth/google', {
+      const response = await api.post('/auth/google', {
         token: credentialResponse.credential,
-        role: role // Backend assigns this role if it's a new user
+        role: role // Backend validates this role matches user's account role
       });
 
-      setMessage("✅ Google Login successful!");
-      setTimeout(() => {
-        navigate("/dashboard"); // Redirect to dashboard
-      }, 1500);
+      // Extract data from response
+      const { token, email: responseEmail, name, role: responseRole } = response.data;
+
+      // Store user info and token in localStorage
+      localStorage.setItem('token', token);
+      localStorage.setItem('userName', name);
+      localStorage.setItem('userEmail', responseEmail);
+      localStorage.setItem('userRole', responseRole);
+      const googleSuccessMessage = response.data?.message || "Login successful.";
+      setMessage("✅ " + googleSuccessMessage);
+
+      // Redirect based on role
+      if (responseRole === "ADMIN") {
+        setTimeout(() => {
+          navigate("/admin-dashboard");
+        }, 1500);
+      } else if (responseRole === "OWNER") {
+        setTimeout(() => {
+          navigate("/menu-dashboard");
+        }, 1500);
+      } else {
+        // Student, go to dashboard
+        setTimeout(() => {
+          navigate("/dashboard");
+        }, 1500);
+      }
 
     } catch (error) {
-      setMessage("❌ Google authentication failed.");
+      if (error.response?.data) {
+        const backendMessage = error.response.data?.error || error.response.data?.message || error.response.data;
+        setMessage("❌ " + backendMessage);
+      } else {
+        setMessage("❌ Google authentication failed.");
+      }
     }
   };
 

@@ -1,3 +1,7 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
 /* Reset default browser margins and remove Vite's 1280px limit */
 html, body, #root {
   margin: 0;
@@ -9,4 +13,158 @@ html, body, #root {
 
 * {
   box-sizing: border-box;
+}
+
+.student-dashboard {
+  min-height: 100vh;
+  background-color: #f8fafc;
+  color: #1f2937;
+  font-family: ui-sans-serif, system-ui, sans-serif;
+}
+
+.dashboard-header {
+  background-color: #800000;
+  color: white;
+  padding: 2rem 1.5rem;
+  text-align: center;
+  border-bottom-left-radius: 1.5rem;
+  border-bottom-right-radius: 1.5rem;
+  box-shadow: 0 20px 30px rgba(0, 0, 0, 0.1);
+}
+
+.dashboard-main {
+  padding: 0 1rem;
+  max-width: 28rem;
+  margin: 0 auto;
+  margin-top: -2rem;
+  position: relative;
+  z-index: 10;
+}
+
+.wallet-card {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.25rem;
+  border-radius: 1rem;
+  background-image: linear-gradient(90deg, #f59e0b, #d97706);
+  color: white;
+  box-shadow: 0 20px 30px rgba(0, 0, 0, 0.12);
+  margin-bottom: 1.5rem;
+}
+
+.wallet-icon {
+  background-color: rgba(255, 255, 255, 0.2);
+  padding: 0.75rem;
+  border-radius: 9999px;
+}
+
+.search-bar {
+  position: relative;
+  margin-bottom: 1.5rem;
+}
+
+.search-input {
+  width: 100%;
+  background-color: white;
+  border-radius: 1rem;
+  padding: 0.9rem 1rem 0.9rem 3rem;
+  border: 1px solid #e5e7eb;
+  box-shadow: 0 4px 10px rgba(15, 23, 42, 0.04);
+  outline: none;
+}
+
+.search-bar svg {
+  position: absolute;
+  left: 0.75rem;
+  top: 0.9rem;
+  color: #9ca3af;
+}
+
+.stalls-list {
+  display: grid;
+  gap: 1rem;
+}
+
+.stall-card {
+  display: flex;
+  align-items: center;
+  padding: 1rem;
+  border-radius: 1rem;
+  background-color: white;
+  border: 1px solid #e5e7eb;
+  box-shadow: 0 10px 20px rgba(15, 23, 42, 0.05);
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.stall-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 20px 30px rgba(15, 23, 42, 0.1);
+}
+
+.stall-icon {
+  width: 4rem;
+  height: 4rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 1rem;
+  margin-right: 1rem;
+  background-color: #f8fafc;
+  font-size: 1.5rem;
+}
+
+.status-pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.25rem 0.5rem;
+  border-radius: 0.375rem;
+  font-size: 0.625rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.status-pill.bg-green-100 {
+  background-color: #d1fae5;
+  color: #166534;
+}
+
+.status-pill.bg-gray-100 {
+  background-color: #f3f4f6;
+  color: #6b7280;
+}
+
+.bottom-nav {
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+  max-width: 28rem;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: white;
+  border-top: 1px solid #e5e7eb;
+  display: flex;
+  justify-content: space-around;
+  padding: 0.75rem 0;
+}
+
+.nav-button {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  color: #9a3412;
+  background: transparent;
+  border: none;
+}
+
+.nav-button span {
+  font-size: 0.65rem;
+  margin-top: 0.25rem;
+}
+
+.nav-button svg {
+  color: inherit;
 }
