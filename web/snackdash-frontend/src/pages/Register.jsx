@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
+import api from "../lib/api";
 import { UserPlus } from "lucide-react";
 
 export default function Register() {
@@ -28,14 +28,14 @@ export default function Register() {
     }
 
     try {
-      await axios.post("http://localhost:8080/api/auth/register", {
+      await api.post("/auth/register", {
         name,
         email,
         password,
         role,
       });
 
-      const loginResponse = await axios.post("http://localhost:8080/api/auth/login", {
+      const loginResponse = await api.post("/auth/login", {
         email,
         password,
         role,

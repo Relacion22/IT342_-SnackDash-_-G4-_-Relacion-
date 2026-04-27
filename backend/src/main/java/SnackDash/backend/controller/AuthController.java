@@ -15,6 +15,7 @@ import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.gson.GsonFactory;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -32,6 +33,9 @@ public class AuthController {
 
     @Autowired
     private JwtTokenProvider jwtTokenProvider;
+
+    @Value("${GOOGLE_CLIENT_ID:YOUR_CLIENT_ID_HERE.apps.googleusercontent.com}")
+    private String googleClientId;
 
     @PostMapping("/register")
     public ResponseEntity<?> register(@RequestBody RegisterRequest request) {
@@ -81,8 +85,8 @@ public class AuthController {
     @PostMapping("/google")
     public ResponseEntity<?> googleLogin(@RequestBody GoogleLoginRequest request) {
         try {
-            // IMPORTANT: Replace this string with the EXACT Client ID you used in your React frontend's <GoogleOAuthProvider>
-            String clientId = "YOUR_CLIENT_ID_HERE.apps.googleusercontent.com";
+            // Use configured Google client ID, or override with GOOGLE_CLIENT_ID environment variable.
+            String clientId = googleClientId;
 
             // 1. Set up the Google Verifier
             GoogleIdTokenVerifier verifier = new GoogleIdTokenVerifier.Builder(new NetHttpTransport(), new GsonFactory())

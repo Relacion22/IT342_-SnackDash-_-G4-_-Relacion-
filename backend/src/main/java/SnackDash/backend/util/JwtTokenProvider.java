@@ -1,11 +1,14 @@
 package SnackDash.backend.util;
 
+import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
+import io.jsonwebtoken.JwtException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import jakarta.annotation.PostConstruct;
 import javax.crypto.SecretKey;
 import java.util.Date;
 
@@ -18,7 +21,7 @@ public class JwtTokenProvider {
     private static final long JWT_EXPIRATION_MS = 86400000; // 24 hours
 
     // Initialize the SECRET_KEY from the property after construction
-    @jakarta.annotation.PostConstruct
+    @PostConstruct
     private void init() {
         SECRET_KEY = Keys.hmacShaKeyFor(secretKeyString.getBytes());
     }
@@ -31,10 +34,10 @@ public class JwtTokenProvider {
         Date expiryDate = new Date(now.getTime() + JWT_EXPIRATION_MS);
 
         return Jwts.builder()
-                .subject(email)
+                .setSubject(email)
                 .claim("role", role)
-                .issuedAt(now)
-                .expiration(expiryDate)
+                .setIssuedAt(now)
+                .setExpiration(expiryDate)
                 .signWith(SECRET_KEY, SignatureAlgorithm.HS512)
                 .compact();
     }
@@ -44,13 +47,13 @@ public class JwtTokenProvider {
      */
     public String getEmailFromToken(String token) {
         try {
-            return Jwts.parser()
-                    .verifyWith(SECRET_KEY)
+            Claims claims = Jwts.parser()
+                    .setSigningKey(SECRET_KEY)
                     .build()
-                    .parseSignedClaims(token)
-                    .getPayload()
-                    .getSubject();
-        } catch (Exception e) {
+                    .parseClaimsJws(token)
+                    .getBody();
+            return claims.getSubject();
+        } catch (JwtException | IllegalArgumentException e) {
             return null;
         }
     }
@@ -60,13 +63,14 @@ public class JwtTokenProvider {
      */
     public String getRoleFromToken(String token) {
         try {
-            return (String) Jwts.parser()
-                    .verifyWith(SECRET_KEY)
+            Claims claims = Jwts.parser()
+                    .setSigningKey(SECRET_KEY)
                     .build()
-                    .parseSignedClaims(token)
-                    .getPayload()
-                    .get("role");
-        } catch (Exception e) {
+                    .parseClaimsJws(token)
+                    .getBody();
+            Object roleObj = claims.get("role");
+            return roleObj != null ? roleObj.toString() : null;
+        } catch (JwtException | IllegalArgumentException e) {
             return null;
         }
     }
@@ -77,11 +81,11 @@ public class JwtTokenProvider {
     public boolean validateToken(String token) {
         try {
             Jwts.parser()
-                    .verifyWith(SECRET_KEY)
+                    .setSigningKey(SECRET_KEY)
                     .build()
-                    .parseSignedClaims(token);
+                    .parseClaimsJws(token);
             return true;
-        } catch (Exception e) {
+        } catch (JwtException | IllegalArgumentException e) {
             return false;
         }
     }
