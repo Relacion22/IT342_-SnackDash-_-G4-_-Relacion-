@@ -8,6 +8,7 @@ import MenuDashboard from './pages/MenuDashboard';
 import CreateStall from './pages/CreateStall';
 import AdminDashboard from './pages/AdminDashboard';
 import ProtectedRoute from './components/ProtectedRoute';
+import EditProfile from './pages/EditProfile';
 
 function App() {
   return (
@@ -23,6 +24,11 @@ function App() {
             <StudentDashboard />
           </ProtectedRoute>
         } />
+        <Route path="/student/edit-profile" element={
+  <ProtectedRoute allowedRoles={['STUDENT']}>
+    <EditProfile />
+  </ProtectedRoute>
+} />
         <Route path="/my-orders" element={
           <ProtectedRoute allowedRoles={['STUDENT']}>
             <StudentOrders />

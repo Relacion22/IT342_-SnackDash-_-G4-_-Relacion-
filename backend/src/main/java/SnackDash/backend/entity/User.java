@@ -22,7 +22,6 @@ public class User {
     @Column(nullable = false)
     private String password;
 
-    // ADDED: For Admin UI (e.g., "2021-0001")
     @Column(name = "school_id", unique = true)
     private String schoolId;
 
@@ -30,7 +29,6 @@ public class User {
     @Column(nullable = false)
     private Enums.Role role;
 
-    // ADDED: For Admin UI User Status
     @Enumerated(EnumType.STRING)
     @Column(name = "account_status", nullable = false)
     private Enums.AccountStatus accountStatus = Enums.AccountStatus.ACTIVE;
@@ -42,77 +40,52 @@ public class User {
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
 
-    // TODO: Generate Getters and Setters here...
+    // ================= NEW FIELDS FOR STUDENT PROFILE =================
+    @Column(name = "course")
+    private String course;
 
-    public Long getId() {
-        return id;
-    }
+    @Column(name = "year_level")
+    private String yearLevel;
 
-    public void setId(Long id) {
-        this.id = id;
-    }
+    @Column(name = "profile_image_url", length = 1000)
+    private String profileImageUrl;
+    // ================================================================
 
-    public String getName() {
-        return name;
-    }
+    // Getters and Setters
 
-    public void setName(String name) {
-        this.name = name;
-    }
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
 
-    public String getEmail() {
-        return email;
-    }
+    public String getName() { return name; }
+    public void setName(String name) { this.name = name; }
 
-    public void setEmail(String email) {
-        this.email = email;
-    }
+    public String getEmail() { return email; }
+    public void setEmail(String email) { this.email = email; }
 
-    public String getPassword() {
-        return password;
-    }
+    public String getPassword() { return password; }
+    public void setPassword(String password) { this.password = password; }
 
-    public void setPassword(String password) {
-        this.password = password;
-    }
+    public String getSchoolId() { return schoolId; }
+    public void setSchoolId(String schoolId) { this.schoolId = schoolId; }
 
-    public String getSchoolId() {
-        return schoolId;
-    }
+    public Enums.Role getRole() { return role; }
+    public void setRole(Enums.Role role) { this.role = role; }
 
-    public void setSchoolId(String schoolId) {
-        this.schoolId = schoolId;
-    }
+    public Enums.AccountStatus getAccountStatus() { return accountStatus; }
+    public void setAccountStatus(Enums.AccountStatus accountStatus) { this.accountStatus = accountStatus; }
 
-    public Enums.Role getRole() {
-        return role;
-    }
+    public BigDecimal getWalletBalance() { return walletBalance; }
+    public void setWalletBalance(BigDecimal walletBalance) { this.walletBalance = walletBalance; }
 
-    public void setRole(Enums.Role role) {
-        this.role = role;
-    }
+    public LocalDateTime getCreatedAt() { return createdAt; }
+    public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
 
-    public Enums.AccountStatus getAccountStatus() {
-        return accountStatus;
-    }
+    public String getCourse() { return course; }
+    public void setCourse(String course) { this.course = course; }
 
-    public void setAccountStatus(Enums.AccountStatus accountStatus) {
-        this.accountStatus = accountStatus;
-    }
+    public String getYearLevel() { return yearLevel; }
+    public void setYearLevel(String yearLevel) { this.yearLevel = yearLevel; }
 
-    public BigDecimal getWalletBalance() {
-        return walletBalance;
-    }
-
-    public void setWalletBalance(BigDecimal walletBalance) {
-        this.walletBalance = walletBalance;
-    }
-
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
-    }
-
-    public void setCreatedAt(LocalDateTime createdAt) {
-        this.createdAt = createdAt;
-    }
+    public String getProfileImageUrl() { return profileImageUrl; }
+    public void setProfileImageUrl(String profileImageUrl) { this.profileImageUrl = profileImageUrl; }
 }

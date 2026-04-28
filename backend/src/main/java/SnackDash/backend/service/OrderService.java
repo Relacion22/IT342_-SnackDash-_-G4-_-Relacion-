@@ -93,7 +93,6 @@ public class OrderService {
             student.setWalletBalance(student.getWalletBalance().subtract(subtotal));
             userRepository.save(student);
         }
-        // For CASH payment, no wallet deduction needed
 
         // Use OrderFactory
         Order order = orderFactory.createOrder(student, stall, subtotal, request.getSpecialInstructions());
@@ -159,6 +158,7 @@ public class OrderService {
         return toOrderResponse(orderRepository.save(order));
     }
 
+    // ================= FIXED TO AVOID CONSTRUCTOR ERRORS =================
     private OrderResponse toOrderResponse(Order order) {
         List<OrderItemSummaryResponse> items = orderItemRepository.findByOrder(order).stream()
                 .map(item -> new OrderItemSummaryResponse(
@@ -171,20 +171,31 @@ public class OrderService {
                 ))
                 .collect(Collectors.toList());
 
-        return new OrderResponse(
-                order.getId(),
-                order.getOrderNumber(),
-                order.getStall().getId(),
-                order.getStall().getName(),
-                order.getStall().getImageUrl(),
-                order.getStatus(),
-                order.getTotalPrice(),
-                order.getSpecialInstructions(),
-                order.getCreatedAt(),
-                order.getUpdatedAt(),
-                items
-        );
+        // Use Setters instead of Constructor
+        OrderResponse response = new OrderResponse();
+        response.setId(order.getId());
+        response.setOrderNumber(order.getOrderNumber());
+        response.setStallId(order.getStall().getId());
+        response.setStallName(order.getStall().getName());
+        response.setStallImageUrl(order.getStall().getImageUrl());
+        response.setStatus(order.getStatus());
+        response.setTotalPrice(order.getTotalPrice());
+        response.setSpecialInstructions(order.getSpecialInstructions());
+        response.setCreatedAt(order.getCreatedAt());
+        response.setUpdatedAt(order.getUpdatedAt());
+        response.setItems(items);
+
+        // Attach the Student Profile details so the Owner Dashboard can display them!
+        if (order.getUser() != null) {
+            response.setStudentName(order.getUser().getName());
+            response.setStudentCourse(order.getUser().getCourse());
+            response.setStudentYear(order.getUser().getYearLevel());
+            response.setStudentImage(order.getUser().getProfileImageUrl());
+        }
+
+        return response;
     }
+    // =====================================================================
 
     private String generateOrderNumber() {
         return "#ORD-" + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMddHHmmss"));

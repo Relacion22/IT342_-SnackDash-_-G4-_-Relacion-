@@ -1,126 +1,75 @@
 package SnackDash.backend.dto;
 
-import SnackDash.backend.entity.Enums;
-
+import SnackDash.backend.entity.Enums.OrderStatus;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 
 public class OrderResponse {
+    
     private Long id;
     private String orderNumber;
     private Long stallId;
     private String stallName;
     private String stallImageUrl;
-    private Enums.OrderStatus status;
+    private OrderStatus status;
     private BigDecimal totalPrice;
     private String specialInstructions;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
     private List<OrderItemSummaryResponse> items;
 
-    public OrderResponse() {
-    }
+    // ================= NEW FIELDS FOR STUDENT PROFILE =================
+    private String studentName;
+    private String studentCourse;
+    private String studentYear;
+    private String studentImage;
+    // ================================================================
 
-    public OrderResponse(Long id, String orderNumber, Long stallId, String stallName, String stallImageUrl, Enums.OrderStatus status, BigDecimal totalPrice, String specialInstructions, LocalDateTime createdAt, LocalDateTime updatedAt, List<OrderItemSummaryResponse> items) {
-        this.id = id;
-        this.orderNumber = orderNumber;
-        this.stallId = stallId;
-        this.stallName = stallName;
-        this.stallImageUrl = stallImageUrl;
-        this.status = status;
-        this.totalPrice = totalPrice;
-        this.specialInstructions = specialInstructions;
-        this.createdAt = createdAt;
-        this.updatedAt = updatedAt;
-        this.items = items;
-    }
+    // --- Original Getters and Setters ---
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
 
-    public Long getId() {
-        return id;
-    }
+    public String getOrderNumber() { return orderNumber; }
+    public void setOrderNumber(String orderNumber) { this.orderNumber = orderNumber; }
 
-    public void setId(Long id) {
-        this.id = id;
-    }
+    public Long getStallId() { return stallId; }
+    public void setStallId(Long stallId) { this.stallId = stallId; }
 
-    public String getOrderNumber() {
-        return orderNumber;
-    }
+    public String getStallName() { return stallName; }
+    public void setStallName(String stallName) { this.stallName = stallName; }
 
-    public void setOrderNumber(String orderNumber) {
-        this.orderNumber = orderNumber;
-    }
+    public String getStallImageUrl() { return stallImageUrl; }
+    public void setStallImageUrl(String stallImageUrl) { this.stallImageUrl = stallImageUrl; }
 
-    public Long getStallId() {
-        return stallId;
-    }
+    public OrderStatus getStatus() { return status; }
+    public void setStatus(OrderStatus status) { this.status = status; }
 
-    public void setStallId(Long stallId) {
-        this.stallId = stallId;
-    }
+    public BigDecimal getTotalPrice() { return totalPrice; }
+    public void setTotalPrice(BigDecimal totalPrice) { this.totalPrice = totalPrice; }
 
-    public String getStallName() {
-        return stallName;
-    }
+    public String getSpecialInstructions() { return specialInstructions; }
+    public void setSpecialInstructions(String specialInstructions) { this.specialInstructions = specialInstructions; }
 
-    public void setStallName(String stallName) {
-        this.stallName = stallName;
-    }
+    public LocalDateTime getCreatedAt() { return createdAt; }
+    public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
 
-    public String getStallImageUrl() {
-        return stallImageUrl;
-    }
+    public LocalDateTime getUpdatedAt() { return updatedAt; }
+    public void setUpdatedAt(LocalDateTime updatedAt) { this.updatedAt = updatedAt; }
 
-    public void setStallImageUrl(String stallImageUrl) {
-        this.stallImageUrl = stallImageUrl;
-    }
+    public List<OrderItemSummaryResponse> getItems() { return items; }
+    public void setItems(List<OrderItemSummaryResponse> items) { this.items = items; }
 
-    public Enums.OrderStatus getStatus() {
-        return status;
-    }
+    // --- New Student Profile Getters and Setters ---
+    public String getStudentName() { return studentName; }
+    public void setStudentName(String studentName) { this.studentName = studentName; }
 
-    public void setStatus(Enums.OrderStatus status) {
-        this.status = status;
-    }
+    public String getStudentCourse() { return studentCourse; }
+    public void setStudentCourse(String studentCourse) { this.studentCourse = studentCourse; }
 
-    public BigDecimal getTotalPrice() {
-        return totalPrice;
-    }
+    public String getStudentYear() { return studentYear; }
+    public void setStudentYear(String studentYear) { this.studentYear = studentYear; }
 
-    public void setTotalPrice(BigDecimal totalPrice) {
-        this.totalPrice = totalPrice;
-    }
-
-    public String getSpecialInstructions() {
-        return specialInstructions;
-    }
-
-    public void setSpecialInstructions(String specialInstructions) {
-        this.specialInstructions = specialInstructions;
-    }
-
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
-    }
-
-    public void setCreatedAt(LocalDateTime createdAt) {
-        this.createdAt = createdAt;
-    }
-
-    public LocalDateTime getUpdatedAt() {
-        return updatedAt;
-    }
-
-    public void setUpdatedAt(LocalDateTime updatedAt) {
-        this.updatedAt = updatedAt;
-    }
-
-    public List<OrderItemSummaryResponse> getItems() {
-        return items;
-    }
-
-    public void setItems(List<OrderItemSummaryResponse> items) {
-        this.items = items;
-    }
+    public String getStudentImage() { return studentImage; }
+    public void setStudentImage(String studentImage) { this.studentImage = studentImage; }
 }

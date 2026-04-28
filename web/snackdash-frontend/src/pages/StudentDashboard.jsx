@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import './StudentDashboard.css';
 import api from '../lib/api';
-import { Search, Home, Receipt, User, Clock3, Building2 } from 'lucide-react';
+import { Search, Home, Receipt, User, Building2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 const StudentDashboard = () => {
@@ -10,10 +10,12 @@ const StudentDashboard = () => {
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
 
+  // ✅ Read from localStorage
   const user = {
-    name: 'Juan Dela Cruz',
-    course: 'BS Information Technology',
-    year: '3rd Year',
+    name: localStorage.getItem('userName') || 'Mekaela G. Relacion',
+    course: localStorage.getItem('userCourse') || 'BS Information Technology',
+    year: localStorage.getItem('userYear') || '3rd Year',
+    profileImage: localStorage.getItem('userProfileImage') || 'https://via.placeholder.com/150',
     wallet: '₱ 1,250.00',
     level: 'Student',
   };
@@ -40,12 +42,12 @@ const StudentDashboard = () => {
     };
 
     loadStalls();
-    // Auto-refresh stalls every 3 seconds to pick up status changes from owner
     const intervalId = setInterval(loadStalls, 3000);
     return () => clearInterval(intervalId);
   }, []);
 
   const availableStalls = stalls.filter((stall) => stall.isOpen ?? stall.open);
+
   const filteredStalls = availableStalls.filter((stall) =>
     stall.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
     stall.category?.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -70,13 +72,16 @@ const StudentDashboard = () => {
           <div className="student-dashboard-hero-copy">
             <p className="hero-label">Student Hub</p>
             <h1>Good afternoon, {user.name.split(' ')[0]}</h1>
-            <p className="hero-description">Find the best campus food stalls fast. Only open stalls are shown for a quick ordering experience.</p>
+            <p className="hero-description">
+              Find the best campus food stalls fast. Only open stalls are shown for a quick ordering experience.
+            </p>
           </div>
         </div>
       </div>
 
       <main className="student-dashboard-main">
         <div className="student-dashboard-layout">
+          
           <aside className="student-dashboard-sidebar">
             <div className="sidebar-card sidebar-brand">
               <p className="subtitle-muted">SnackDash</p>
@@ -89,8 +94,21 @@ const StudentDashboard = () => {
                   <p className="subtitle-muted">Your profile</p>
                   <h2>Student Info</h2>
                 </div>
-                <div className="avatar-circle profile-avatar">
-                  <User size={20} />
+
+                {/* ✅ Clickable Profile Image */}
+                <div
+                  onClick={() => {
+                    console.log("Navigating to Edit Profile...");
+                    navigate('/student/edit-profile');
+                  }}
+                  className="avatar-circle profile-avatar cursor-pointer hover:opacity-80 transition"
+                  style={{ padding: 0, overflow: 'hidden', background: 'transparent' }}
+                >
+                  <img
+                    src={user.profileImage}
+                    alt="Profile"
+                    style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                  />
                 </div>
               </div>
 
@@ -108,16 +126,40 @@ const StudentDashboard = () => {
               </div>
             </div>
 
+            {/* ✅ UPDATED NAVIGATION WITH DEBUG */}
             <nav className="sidebar-nav">
-              <button className="nav-link active">
+              <button 
+                className="nav-link active" 
+                onClick={(e) => { 
+                  e.preventDefault(); 
+                  console.log("Navigating to Dashboard...");
+                  navigate('/dashboard'); 
+                }}
+              >
                 <Home size={18} />
                 Home
               </button>
-              <button className="nav-link">
+
+              <button 
+                className="nav-link" 
+                onClick={(e) => { 
+                  e.preventDefault(); 
+                  console.log("Navigating to Orders page...");
+                  navigate('/my-orders'); 
+                }}
+              >
                 <Receipt size={18} />
                 Orders
               </button>
-              <button className="nav-link">
+
+              <button 
+                className="nav-link" 
+                onClick={(e) => { 
+                  e.preventDefault(); 
+                  console.log("Navigating to Edit Profile...");
+                  navigate('/student/edit-profile'); 
+                }}
+              >
                 <User size={18} />
                 Profile
               </button>
@@ -178,19 +220,32 @@ const StudentDashboard = () => {
                   <div className="student-stall-card empty-card">Loading stalls...</div>
                 ) : filteredStalls.length > 0 ? (
                   filteredStalls.map((stall) => (
-                    <div key={stall.id} className="student-stall-card" onClick={() => navigate(`/stalls/${stall.id}`)} style={{ cursor: "pointer" }}>
+                    <div
+                      key={stall.id}
+                      className="student-stall-card"
+                      onClick={() => navigate(`/stalls/${stall.id}`)}
+                      style={{ cursor: "pointer" }}
+                    >
                       {stall.imageUrl && (
-                        <div style={{ width: "100%", height: "120px", borderRadius: "12px 12px 0 0", objectFit: "cover", overflow: "hidden" }}>
-                          <img src={stall.imageUrl} alt={stall.name} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                        <div style={{ width: "100%", height: "120px", borderRadius: "12px 12px 0 0", overflow: "hidden" }}>
+                          <img
+                            src={stall.imageUrl}
+                            alt={stall.name}
+                            style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                          />
                         </div>
                       )}
+
                       <div className="student-stall-card-top">
                         <div className="student-stall-icon">{getIcon(stall)}</div>
                         <span className="status-badge">Open</span>
                       </div>
+
                       <h3>{stall.name}</h3>
                       <p>{stall.category || 'Campus Stall'}</p>
-                      <p style={{ marginTop: '0.75rem', color: '#64748b' }}>{stall.description || 'Fresh campus food.'}</p>
+                      <p style={{ marginTop: '0.75rem', color: '#64748b' }}>
+                        {stall.description || 'Fresh campus food.'}
+                      </p>
                     </div>
                   ))
                 ) : (
@@ -200,6 +255,7 @@ const StudentDashboard = () => {
                 )}
               </div>
             </div>
+
           </section>
         </div>
       </main>
