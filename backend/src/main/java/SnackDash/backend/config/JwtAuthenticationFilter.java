@@ -32,22 +32,28 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             String authHeader = request.getHeader("Authorization");
             if (authHeader != null && authHeader.startsWith("Bearer ")) {
                 String token = authHeader.substring(7);
-
                 if (tokenProvider.validateToken(token)) {
                     String email = tokenProvider.getEmailFromToken(token);
-
                     UserDetails userDetails = userDetailsService.loadUserByUsername(email);
-                    UsernamePasswordAuthenticationToken authentication = 
-                            new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
-                    authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
 
+                    // ==========================================
+                    // NEW: Check if the user was suspended AFTER they logged in
+                    // ==========================================
+                    if (!userDetails.isEnabled() || !userDetails.isAccountNonLocked()) {
+                        response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Your account has been suspended.");
+                        return; // Stop the request immediately
+                    }
+                    // ==========================================
+
+                    UsernamePasswordAuthenticationToken authentication = 
+                             new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+                    authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                     SecurityContextHolder.getContext().setAuthentication(authentication);
                 }
             }
         } catch (Exception ex) {
             logger.error("Could not set user authentication in security context", ex);
         }
-
         filterChain.doFilter(request, response);
     }
 }

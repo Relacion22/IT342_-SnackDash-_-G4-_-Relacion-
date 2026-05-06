@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import './StudentDashboard.css';
 import api from '../lib/api';
-import { Search, Home, Receipt, User, Building2 } from 'lucide-react';
+import { Search, Home, Receipt, User, Building2, LogOut } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 const StudentDashboard = () => {
@@ -139,6 +139,7 @@ const StudentDashboard = () => {
                 <Home size={18} />
                 Home
               </button>
+              
 
               <button 
                 className="nav-link" 
@@ -163,6 +164,7 @@ const StudentDashboard = () => {
                 <User size={18} />
                 Profile
               </button>
+              {/* NEW LOGOUT BUTTON */} <div style={{ marginTop: "1rem", paddingTop: "1rem", borderTop: "1px solid #f1f5f9" }}> <button className="nav-link" onClick={(e) => { e.preventDefault(); localStorage.clear(); navigate('/login'); }} style={{ color: "#e11d48" }} > <LogOut size={18} /> Logout </button> </div> {/* END LOGOUT BUTTON */}
             </nav>
           </aside>
 

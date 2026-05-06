@@ -135,4 +135,28 @@ public class StallService {
                 updatedStall.getCreatedAt()
         );
     }
+    /**
+     * ADMIN FUNCTION: Toggle stall open/close status by Stall ID
+     */
+    public StallResponse adminToggleStallStatus(Long stallId) {
+        Optional<Stall> stallOpt = stallRepository.findById(stallId);
+        if (stallOpt.isEmpty()) {
+            throw new RuntimeException("Stall not found with ID: " + stallId);
+        }
+        
+        Stall stall = stallOpt.get();
+        stall.setOpen(!stall.isOpen()); // Flip the boolean
+        
+        Stall updatedStall = stallRepository.save(stall);
+        
+        return new StallResponse(
+                updatedStall.getId(),
+                updatedStall.getName(),
+                updatedStall.getCategory(),
+                updatedStall.getDescription(),
+                updatedStall.getImageUrl(),
+                updatedStall.isOpen(),
+                updatedStall.getCreatedAt()
+        );
+    }
 }

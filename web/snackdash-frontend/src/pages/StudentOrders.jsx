@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import api from "../lib/api";
-import { ShoppingBag, X, DollarSign, Home, Receipt, User } from "lucide-react";
+import { ShoppingBag, X, DollarSign, Home, Receipt, User, LogOut } from "lucide-react";
 import './StudentDashboard.css'; 
 
 const STATUS_STEPS = ["PENDING", "PREPARING", "READY", "COMPLETED"];
@@ -127,6 +127,22 @@ export default function StudentOrders() {
               >
                 <User size={18} /> Profile
               </button>
+              {/* NEW LOGOUT BUTTON */}
+            <div style={{ marginTop: "1rem", paddingTop: "1rem", borderTop: "1px solid #f1f5f9" }}>
+              <button 
+                className="nav-link" 
+                onClick={(e) => { 
+                  e.preventDefault(); 
+                  localStorage.clear(); 
+                  navigate('/login'); 
+                }} 
+                style={{ color: "#e11d48" }}
+              >
+                <LogOut size={18} />
+                Logout
+              </button>
+            </div>
+            {/* END LOGOUT BUTTON */}
             </nav>
           </aside>
 

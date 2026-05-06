@@ -3,7 +3,7 @@ package SnackDash.backend.controller;
 import SnackDash.backend.dto.LoginRequest;
 import SnackDash.backend.dto.LoginResponse;
 import SnackDash.backend.dto.RegisterRequest;
-import SnackDash.backend.dto.GoogleLoginRequest; // Make sure you created this DTO
+import SnackDash.backend.dto.GoogleLoginRequest;
 import SnackDash.backend.entity.User;
 import SnackDash.backend.service.UserService;
 import SnackDash.backend.util.JwtTokenProvider;
@@ -59,6 +59,13 @@ public class AuthController {
         if (userOpt.isPresent()) {
             User user = userOpt.get();
             
+            // ==========================================
+            // BLOCK SUSPENDED USERS FROM STANDARD LOGIN
+            // ==========================================
+            if (user.getAccountStatus() == SnackDash.backend.entity.Enums.AccountStatus.SUSPENDED) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("❌ Your account is suspended. Please contact admin.");
+            }
+            
             // Check if the user's role matches the requested role
             if (request.getRole() != null && !request.getRole().equals(user.getRole().toString())) {
                 return ResponseEntity.status(HttpStatus.FORBIDDEN).body("❌ Invalid role. You are a " + user.getRole() + ", not a " + request.getRole() + ".");
@@ -105,6 +112,13 @@ public class AuthController {
 
                 // 4. Find or create the user in your database using the service method
                 User user = userService.processOAuthPostLogin(email, name, request.getRole());
+
+                // ==========================================
+                // BLOCK SUSPENDED USERS FROM GOOGLE LOGIN
+                // ==========================================
+                if (user.getAccountStatus() == SnackDash.backend.entity.Enums.AccountStatus.SUSPENDED) {
+                    return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("❌ Your account is suspended. Please contact admin.");
+                }
 
                 // 5. Check if the user's role matches the requested role
                 if (request.getRole() != null && !request.getRole().equals(user.getRole().toString())) {

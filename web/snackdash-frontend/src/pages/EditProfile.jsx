@@ -1,6 +1,6 @@
 import React, { useState, useRef } from 'react';
 import './StudentDashboard.css';
-import { Home, Receipt, User, Camera } from 'lucide-react';
+import { Home, Receipt, User, Camera, LogOut } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import api from '../lib/api';
 import { uploadImageToSupabase } from '../lib/storage';
@@ -149,6 +149,22 @@ const EditProfile = () => {
               >
                 <User size={18} /> Profile
               </button>
+              {/* NEW LOGOUT BUTTON */}
+            <div style={{ marginTop: "1rem", paddingTop: "1rem", borderTop: "1px solid #f1f5f9" }}>
+              <button 
+                className="nav-link" 
+                onClick={(e) => { 
+                  e.preventDefault(); 
+                  localStorage.clear(); 
+                  navigate('/login'); 
+                }} 
+                style={{ color: "#e11d48" }}
+              >
+                <LogOut size={18} />
+                Logout
+              </button>
+            </div>
+            {/* END LOGOUT BUTTON */}
             </nav>
           </aside>
 
