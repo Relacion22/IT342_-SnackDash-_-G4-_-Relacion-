@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import api from "../lib/api";
+import api from "../../lib/api";
 import { ShoppingBag, X, DollarSign, Home, Receipt, User, LogOut } from "lucide-react";
-import './StudentDashboard.css'; 
+import "../../pages/StudentDashboard.css";
 
 const STATUS_STEPS = ["PENDING", "PREPARING", "READY", "COMPLETED"];
 

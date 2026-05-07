@@ -1,9 +1,9 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import api from "../lib/api";
+import api from "../../lib/api";
 import { Trash2, Edit2, Upload, Power, Store, UtensilsCrossed, ListOrdered, Plus, Receipt, User, Clock, CheckCircle } from "lucide-react";
-import { uploadImageToSupabase } from "../lib/storage";
-import './StudentDashboard.css'; 
+import { uploadImageToSupabase } from "../../lib/storage";
+import "../../pages/StudentDashboard.css";
 
 export default function MenuDashboard() {
   const navigate = useNavigate();

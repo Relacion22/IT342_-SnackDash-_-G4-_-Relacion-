@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import './StudentDashboard.css';
-import api from '../lib/api';
+import "../../pages/StudentDashboard.css";
+import api from '../../lib/api';
 import { Search, Home, Receipt, User, Building2, LogOut } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 

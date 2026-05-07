@@ -51,39 +51,36 @@ public class AdminController {
     // 2. USER MANAGEMENT
     // ==========================================
     @GetMapping("/users")
-    public ResponseEntity<ApiResponse<Page<User>>> getAllUsers(
+    public ResponseEntity<ApiResponse<Map<String, Object>>> getAllUsers(
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size) {
-        Page<User> users = userRepository.findAll(
+            @RequestParam(defaultValue = "50") int size) {
+        
+        Page<User> usersPage = userRepository.findAll(
                 PageRequest.of(page, size, Sort.by("id").descending())
         );
-        return ResponseEntity.ok(ApiResponse.success(users));
+
+        // Safely map the raw Database Entities to prevent Lazy-Loading crashes
+        List<Map<String, Object>> safeUsers = usersPage.getContent().stream().map(user -> {
+            Map<String, Object> map = new HashMap<>();
+            map.put("id", user.getId());
+            map.put("name", user.getName());
+            map.put("email", user.getEmail());
+            
+            // Safely convert Enums to Strings
+            map.put("role", user.getRole() != null ? user.getRole().name() : "N/A");
+            map.put("accountStatus", user.getAccountStatus() != null ? user.getAccountStatus().name() : "ACTIVE");
+            
+            map.put("walletBalance", user.getWalletBalance());
+            return map;
+        }).collect(Collectors.toList());
+
+        // Re-package the data into the exact format React expects (res.data.data.content)
+        Map<String, Object> responseData = new HashMap<>();
+        responseData.put("content", safeUsers);
+        responseData.put("totalPages", usersPage.getTotalPages());
+
+        return ResponseEntity.ok(ApiResponse.success(responseData));
     }
-
-    @PutMapping("/users/{id}/toggle-status")
-    public ResponseEntity<ApiResponse<String>> toggleUserStatus(@PathVariable Long id) {
-        // 1. Find the user
-        User user = userRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("User not found with ID: " + id));
-
-        // 2. Prevent admins from suspending themselves
-        if (user.getRole() == SnackDash.backend.entity.Enums.Role.ADMIN) {
-            throw new RuntimeException("Cannot modify an Administrator account.");
-        }
-
-        // 3. THE TOGGLE: If Active -> Suspend. If Suspended -> Make Active!
-        if (user.getAccountStatus() == SnackDash.backend.entity.Enums.AccountStatus.ACTIVE) {
-            user.setAccountStatus(SnackDash.backend.entity.Enums.AccountStatus.SUSPENDED);
-        } else {
-            user.setAccountStatus(SnackDash.backend.entity.Enums.AccountStatus.ACTIVE);
-        }
-
-        // 4. Save to database
-        userRepository.save(user);
-
-        return ResponseEntity.ok(ApiResponse.success("User status updated to " + user.getAccountStatus()));
-    }
-
     // ==========================================
     // 3. STALL MANAGEMENT
     // ==========================================
