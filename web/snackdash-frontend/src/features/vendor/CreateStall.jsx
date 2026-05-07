@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { UploadCloud, Store, MapPin, Loader2 } from 'lucide-react';
-import { uploadImageToSupabase } from '../lib/storage';
-import api from '../lib/api';
+import { uploadImageToSupabase } from '../../lib/storage';
+import api from '../../lib/api';
 
 const CreateStall = () => {
   const navigate = useNavigate();

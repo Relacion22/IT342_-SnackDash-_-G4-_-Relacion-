@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import api from "../lib/api";
+import api from "../../lib/api";
 import { ArrowLeft, Clock3, ShoppingBag, X } from "lucide-react";
 
 export default function StallDetails() {

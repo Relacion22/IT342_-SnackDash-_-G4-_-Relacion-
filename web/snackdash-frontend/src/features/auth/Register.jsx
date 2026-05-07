@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import api from "../lib/api";
+import api from "../../lib/api";
 import { UserPlus } from "lucide-react";
 
 export default function Register() {

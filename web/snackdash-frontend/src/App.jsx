@@ -1,14 +1,18 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import Register from './pages/Register';
-import Login from './pages/Login';
-import StudentDashboard from './pages/StudentDashboard';
-import StudentOrders from './pages/StudentOrders';
-import StallDetails from './pages/StallDetails';
-import MenuDashboard from './pages/MenuDashboard';
-import CreateStall from './pages/CreateStall';
+
+// --- UPDATED VERTICAL SLICE IMPORTS ---
+import Register from './features/auth/Register';
+import Login from './features/auth/Login';
+import StudentDashboard from './features/student/StudentDashboard';
+import StudentOrders from './features/student/StudentOrders';
+import StallDetails from './features/vendor/StallDetails';
+import MenuDashboard from './features/vendor/MenuDashboard';
+import CreateStall from './features/vendor/CreateStall';
+
+// --- STANDARD IMPORTS ---
 import AdminDashboard from './pages/AdminDashboard';
-import ProtectedRoute from './components/ProtectedRoute';
 import EditProfile from './pages/EditProfile';
+import ProtectedRoute from './components/ProtectedRoute';
 
 function App() {
   return (
@@ -25,10 +29,10 @@ function App() {
           </ProtectedRoute>
         } />
         <Route path="/student/edit-profile" element={
-  <ProtectedRoute allowedRoles={['STUDENT']}>
-    <EditProfile />
-  </ProtectedRoute>
-} />
+          <ProtectedRoute allowedRoles={['STUDENT']}>
+            <EditProfile />
+          </ProtectedRoute>
+        } />
         <Route path="/my-orders" element={
           <ProtectedRoute allowedRoles={['STUDENT']}>
             <StudentOrders />
